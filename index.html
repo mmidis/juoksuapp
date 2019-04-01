@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <title>Juoksuapp BETA</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <meta name="author" content="Midora Linden">
+    <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
+    <link rel="icon" href="img/icon.jpg" />
+    <style>
+        #input {
+            padding: 10px;
+            border-radius: 10px;
+            margin: 10px 10px 20px 10px
+        }
+
+        #input2 {
+            padding: 10px;
+            border-radius: 10px;
+            margin: 10px
+        }
+
+        #save {
+            background-color: #F15A24;
+            color: white;
+            padding: 10px;
+            width: 150px;
+            border-radius: 10px;
+            margin: 10px;
+        }
+
+        #save:hover {
+            background-color: white;
+            color: #4D4D4D;
+            border-color: #F15A24;
+        }
+
+    </style>
+
+</head>
+
+<body style="text-align: center; font-family: 'Nunito', sans-serif; color: #4D4D4D">
+    <div style="width: 100%; justify-content: center; display:flex">
+        <h4 style="color: #F15A24; font-size: 200%; letter-spacing: 10px; margin-top: 20px">JUOKSUAPP</h4>
+        <p style="color: #808080; font-size: 50%; letter-spacing: 7px; text-align: right">BETA</p>
+    </div>
+
+    <form id="add-to-runlist" method="get">
+        <label>Juoksukilometrit tänään</label><br>
+        <input type="text" placeholder="km" name="input" id="input"><br>
+        <label>Vuositavoite</label><br>
+        <input type="text" placeholder="km" name="input2" id="input2"><br>
+    </form>
+
+    <button type="submit" id="save">Laske</button>
+
+    <p>Tänään juoksin <span id="dayKm" style="font-size: 150%">0</span> kilometriä.</p>
+
+    <p>Matkaa tavoitteeseeni on vielä <span id="yearKm" style="font-size: 150%">0</span> kilometriä.</p>
+
+    <p>Pääset helposti tavoitteeseesi juoksemalla noin <span id="dayGoal" style="font-size: 150%">0</span> kilometriä päivittäin.</p>
+
+    <div style="width: 100%; border: solid; border-color:#d4d4d4; border-width: thin; justify-content: center; display:grid; ">
+        <h3>Vuoden juostut kilometrit</h3>
+        <ol id="km"></ol>
+    </div>
+    
+
+    <!--Scriptit-->
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+
+    <script>
+        let kilometers = null;
+        if(localStorage.getItem("kilometers") === null) {
+          kilometers = [];
+        } else {
+          kilometers = localStorage.getItem("kilometers").split(",");
+        }
+
+        // tämä tulostaa kilsat listaan
+        function showKilometers(kmToShow) {
+            $("#km").empty();
+            for (let i = 0; i < kmToShow.length; i++) {
+                $("#km").append("<li>" + kmToShow[i] + " kilometriä </li>");
+            }
+        }
+
+        // tämä tallentaa localstorageen ja laskee kilsat yhteen
+        $("#save").click(function() {
+            let dayKm = $("#input").val();
+            kilometers.push(dayKm);
+            $('#dayKm').html(dayKm);
+
+            localStorage.setItem("kilometers", kilometers);
+
+            let kilo = localStorage.getItem("kilometers").split(",");
+            let summa = 0;
+            for (let i = 0; i < kilo.length; i++) {
+                summa = summa + parseInt(kilo[i]);
+            }
+
+            let yearGoal = $('#input2').val();
+            let yearKm = yearGoal - summa;
+            $('#yearKm').html(yearKm);
+
+            let dayGoal = yearKm / daysLeft;
+            $('#dayGoal').html(dayGoal.toFixed(2));
+
+            console.log(dayGoal);
+
+            showKilometers(kilometers);
+            localStorage.clear();
+
+        });
+
+        // Eka sivulataus
+        showKilometers(kilometers);
+
+    </script>
+
+    <script>
+        let today = new Date();
+        let newYear = new Date(today.getFullYear(), 11, 31);
+        if (today.getMonth() == 11 && today.getDate() > 31) {
+            newYear.setFullYear(newYear.getFullYear() + 1);
+        }
+        let one_day = 1000 * 60 * 60 * 24;
+        let daysLeft = ((newYear.getTime() - today.getTime()) / (one_day));
+        console.log(Math.ceil((newYear.getTime() - today.getTime()) / (one_day)) + " days left until New Year!");
+
+    </script>
+
+
+    <!-- local storage tallennuksen pätkä saatu Teemu Havulinnalta, apua scriptin toteuttamiseen muuten saatu ohtun Max Mäkiseltä ja päivän haku: https://www.w3resource.com/javascript-exercises/javascript-basic-exercise-9.php -->
+</body>
+
+</html>
